@@ -2,6 +2,24 @@
 
 An end-to-end IoT environment monitor that reads temperature and humidity from a DHT22 sensor on an ESP32, publishes the readings over MQTT, stores them with a Python backend, and displays live telemetry in a browser dashboard.
 
+## Preview
+
+### Dashboard
+
+<img src="Images/dashboard%20top.png" alt="Dashboard top section" width="100%">
+
+<img src="Images/dashboard%20bottom.png" alt="Dashboard history and export section" width="100%">
+
+### Wokwi Simulation
+
+<img src="Images/Wokwi.png" alt="Wokwi ESP32 simulation" width="100%">
+
+<img src="Images/wokwi%20and%20terminal.png" alt="Wokwi simulation with terminal output" width="100%">
+
+### CSV Export
+
+<img src="Images/csv%20history%20.png" alt="CSV history export" width="100%">
+
 ## What This Project Does
 
 The project is split into three working parts:
