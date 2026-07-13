@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Environment Monitoring System</title>
+<meta name="description" content="Live environmental telemetry dashboard for an ESP32 + DHT22 IoT monitoring system.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="scanline" aria-hidden="true"></div>
+
+<div class="app">
+
+  <!-- ============ HEADER ============ -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">
+        <span class="brand-mark-dot"></span>
+      </div>
+      <div class="brand-text">
+        <h1>Smart Environment Monitoring</h1>
+        <p class="brand-sub">ESP32 &middot; DHT22 &middot; MQTT &middot; Flask telemetry API</p>
+      </div>
+    </div>
+
+    <div class="status-cluster">
+      <button class="export-btn" id="exportButton" type="button">Export CSV</button>
+      <div class="status-pill" id="connectionPill" data-state="connecting">
+        <span class="status-dot"></span>
+        <span class="status-text" id="connectionText">Connecting&hellip;</span>
+      </div>
+      <div class="updated-pill">
+        <span class="updated-label">Last update</span>
+        <span class="updated-value" id="lastUpdated">&mdash;&mdash;:&mdash;&mdash;:&mdash;&mdash;</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ ALERT BANNER ============ -->
+  <div class="alert-banner" id="alertBanner" hidden>
+    <div class="alert-icon">!</div>
+    <div class="alert-copy">
+      <span class="alert-title" id="alertTitle">Reading out of expected range</span>
+      <span class="alert-detail" id="alertDetail">Sensor values have exceeded configured thresholds.</span>
+    </div>
+  </div>
+
+  <!-- ============ OFFLINE NOTICE ============ -->
+  <div class="offline-banner" id="offlineBanner" hidden>
+    <div class="offline-icon">&#8734;</div>
+    <div class="alert-copy">
+      <span class="alert-title">Backend unreachable</span>
+      <span class="alert-detail">Could not reach <code id="offlineEndpoint">/api/latest</code>. Retrying automatically&hellip;</span>
+    </div>
+  </div>
+
+  <!-- ============ SENSOR CARDS ============ -->
+  <section class="sensor-grid">
+
+    <article class="sensor-card" id="tempCard" data-metric="temperature">
+      <div class="corner tl"></div><div class="corner tr"></div>
+      <div class="corner bl"></div><div class="corner br"></div>
+
+      <div class="sensor-head">
+        <span class="sensor-module">SENSOR&nbsp;01</span>
+        <span class="sensor-name">Temperature</span>
+      </div>
+
+      <div class="sensor-body">
+        <div class="sensor-reading">
+          <span class="sensor-value" id="tempValue">--</span>
+          <span class="sensor-unit">&deg;C</span>
+        </div>
+        <div class="sensor-trend" id="tempTrend" data-dir="flat">
+          <span class="trend-arrow">&rarr;</span>
+          <span class="trend-text">steady</span>
+        </div>
+      </div>
+
+      <div class="sensor-foot">
+        <div class="sensor-range">
+          <span>Normal range</span>
+          <strong id="tempRangeLabel">10&ndash;35&deg;C</strong>
+        </div>
+        <div class="sparkline-wrap">
+          <canvas id="tempSpark" height="36"></canvas>
+        </div>
+      </div>
+    </article>
+
+    <article class="sensor-card" id="humCard" data-metric="humidity">
+      <div class="corner tl"></div><div class="corner tr"></div>
+      <div class="corner bl"></div><div class="corner br"></div>
+
+      <div class="sensor-head">
+        <span class="sensor-module">SENSOR&nbsp;02</span>
+        <span class="sensor-name">Humidity</span>
+      </div>
+
+      <div class="sensor-body">
+        <div class="sensor-reading">
+          <span class="sensor-value" id="humValue">--</span>
+          <span class="sensor-unit">%RH</span>
+        </div>
+        <div class="sensor-trend" id="humTrend" data-dir="flat">
+          <span class="trend-arrow">&rarr;</span>
+          <span class="trend-text">steady</span>
+        </div>
+      </div>
+
+      <div class="sensor-foot">
+        <div class="sensor-range">
+          <span>Normal range</span>
+          <strong id="humRangeLabel">20&ndash;70%</strong>
+        </div>
+        <div class="sparkline-wrap">
+          <canvas id="humSpark" height="36"></canvas>
+        </div>
+      </div>
+    </article>
+
+  </section>
+
+  <!-- ============ TREND CHARTS ============ -->
+  <section class="charts-grid">
+
+    <div class="chart-panel">
+      <div class="panel-head">
+        <div>
+          <span class="panel-eyebrow">Telemetry log</span>
+          <h2>Temperature trend</h2>
+        </div>
+        <span class="panel-meta" id="tempPoints">0 samples</span>
+      </div>
+      <div class="chart-canvas-wrap">
+        <canvas id="tempChart"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-panel">
+      <div class="panel-head">
+        <div>
+          <span class="panel-eyebrow">Telemetry log</span>
+          <h2>Humidity trend</h2>
+        </div>
+        <span class="panel-meta" id="humPoints">0 samples</span>
+      </div>
+      <div class="chart-canvas-wrap">
+        <canvas id="humChart"></canvas>
+      </div>
+    </div>
+
+  </section>
+
+  <section class="history-panel">
+    <div class="panel-head">
+      <div>
+        <span class="panel-eyebrow">Data history</span>
+        <h2>Recent readings</h2>
+      </div>
+      <span class="panel-meta" id="historyCount">0 entries</span>
+    </div>
+    <div class="history-table-wrap">
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Temperature</th>
+            <th>Humidity</th>
+          </tr>
+        </thead>
+        <tbody id="historyBody">
+          <tr>
+            <td colspan="3" class="history-empty">No history yet.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="footer-col">
+      <span class="footer-label">Data source</span>
+      <span class="footer-value">GET <code id="footerEndpoint">/api/latest</code></span>
+    </div>
+    <div class="footer-col">
+      <span class="footer-label">Poll interval</span>
+      <span class="footer-value" id="footerInterval">5s</span>
+    </div>
+    <div class="footer-col">
+      <span class="footer-label">Pipeline</span>
+      <span class="footer-value">ESP32 &rarr; MQTT broker &rarr; Flask API &rarr; Dashboard</span>
+    </div>
+    <div class="footer-col footer-extend">
+      <span class="footer-label">Roadmap</span>
+      <span class="footer-value">CSV export &middot; SQLite history &middot; alert rules &middot; auth</span>
+    </div>
+  </footer>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
