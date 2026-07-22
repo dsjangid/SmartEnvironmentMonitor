@@ -1,0 +1,22 @@
+# Python Virtual Environment & Cache
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Databases & Dynamic Files
+data/*.db
+data/*.db-journal
+exports/*.csv
+
+# IDE & OS Files
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.tmp
+
+# Test & Coverage
+.pytest_cache/
+.coverage

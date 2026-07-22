@@ -1,0 +1,9 @@
+Item,Designator,Quantity,Component Description,Manufacturer / Part Number,Package/Footprint,Unit Price (USD),Supplier
+1,U1,1,ESP32 Development Board 30-Pin,Espressif Systems ESP32-WROOM-32,DIP-30 / Module,$4.50,DigiKey / Mouser
+2,U2,1,DHT22 Digital Temperature & Humidity Sensor,Aosong DHT22 / AM2302,4-Pin TO-92 Style,$3.80,Adafruit / SparkFun
+3,R1,1,10k Ohm 1/4W 5% Metal Film Resistor (Pull-up for DHT DATA),Yageo MFR-25FRF52-10K,Axial Through-Hole,$0.10,DigiKey
+4,C1,1,0.1uF 50V Ceramic Decoupling Capacitor (VCC to GND),KEMET C315C104M5U5TA,Radial Through-Hole,$0.15,DigiKey
+5,D1,1,Status Indicator LED 3mm Blue (GPIO2 Status),Kingbright WP710A10PBC/A,3mm LED Through-Hole,$0.25,Mouser
+6,R2,1,220 Ohm 1/4W Current Limiting Resistor for LED,Yageo MFR-25FRF52-220R,Axial Through-Hole,$0.10,DigiKey
+7,J1,1,Micro-USB Power Cable 5V 1A,Generic USB 2.0 A to Micro-B,Cable 1m,$1.50,Generic
+8,BOARD,1,Solderless Breadboard 400 Tie-Points,Elegoo MB-102,Standard Breadboard,$2.50,Amazon
