@@ -255,6 +255,53 @@ CSV export files:
 exports/environment_history_YYYYMMDD_HHMMSS.csv
 ```
 
+## Performance Metrics
+
+These metrics are based on the current default configuration:
+
+- ESP32 publish interval: `2000 ms` (`ESP32/sketch.ino`)
+- Dashboard poll interval: `5000 ms` (`Dashboard/config.js`)
+
+### 1) Power Consumption (ESP32 @ 3.3V)
+
+- **Wi-Fi active mode (typical ESP32 range):** ~`80–260 mA` → **`264–858 mW`**
+- **Deep sleep mode (typical ESP32 range):** ~`10–150 µA` → **`0.033–0.495 mW`**
+
+> Note: this firmware does not currently enter deep sleep; values above are hardware reference ranges and can vary by board, regulator, and radio conditions.
+
+### 2) MQTT Latency (Sensor Read → Dashboard)
+
+- Sensor values are produced every **2 seconds**.
+- MQTT transport + backend processing are typically sub-second on stable networks.
+- Dashboard refresh is polling-based every **5 seconds**.
+
+**Expected end-to-end UI latency (default settings):**
+- **Best case:** ~`<1 second` (data arrives just before dashboard poll)
+- **Typical:** ~`2–4 seconds`
+- **Worst case:** ~`~5–7 seconds` (data arrives just after a poll and waits for next cycle)
+
+### 3) Dashboard Update Frequency
+
+- Dashboard updates from `/api/latest` every **5 seconds** (`POLL_INTERVAL_MS = 5000`).
+- Effective update rate: **`0.2 Hz`**.
+
+### 4) SQLite Storage Capacity (Retention Estimate)
+
+At one saved row every 2 seconds:
+
+- **Rows/day:** `86,400 / 2 = 43,200`
+- **Rows/year:** `43,200 × 365 = 15,768,000`
+
+Approximate disk usage is usually in the low MB/day range for this schema. A practical planning estimate is:
+
+- **~4–7 MB/day** (depends on SQLite page usage and timestamp/value sizes)
+
+Estimated retention by DB budget:
+
+- **100 MB** → ~`14–25 days`
+- **500 MB** → ~`71–125 days`
+- **1 GB** → ~`143–250 days`
+
 ## Running Only The MQTT Subscriber
 
 If you want to test MQTT ingestion without the Flask dashboard:
