@@ -77,7 +77,7 @@ def start_mqtt_listener() -> None:
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", "5000"))
+    port = int(os.environ.get("PORT", "5001"))
     mqtt_thread = threading.Thread(target=start_mqtt_listener, daemon=True)
     mqtt_thread.start()
     app.run(host="0.0.0.0", port=port, debug=True, use_reloader=False)
